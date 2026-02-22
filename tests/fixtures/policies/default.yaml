@@ -1,0 +1,49 @@
+# Default MCPCheck policy
+version: "1"
+name: "default-policy"
+description: "Default security policy for MCP tool invocations"
+
+rules:
+  # Block dangerous shell commands
+  - name: "block-shell-execution"
+    description: "Block direct shell/bash execution tools"
+    condition:
+      tool_name_pattern: "^(execute_bash|exec_shell|run_command|shell_exec)$"
+    action: BLOCK
+
+  # Block write access to sensitive paths
+  - name: "block-sensitive-writes"
+    description: "Block writes to system directories"
+    condition:
+      tool_name: "write_file"
+      param_matches:
+        path: "^(/etc/|/usr/|/bin/|/sbin/|/var/|~/.ssh/|~/.aws/).*"
+    action: BLOCK
+
+  # Audit file reads from home directory
+  - name: "audit-home-reads"
+    description: "Audit reads from home directory"
+    condition:
+      tool_name: "read_file"
+      param_matches:
+        path: "^(/home/|/Users/|~/).*"
+    action: AUDIT
+
+  # Block sending to external domains
+  - name: "block-external-email"
+    description: "Block sending emails to non-company domains"
+    condition:
+      tool_name: "send_email"
+      param_matches:
+        recipient: ".*@(?!company\\.com$).*"
+    action: BLOCK
+    unless:
+      param_contains:
+        recipient: "@company.com"
+
+  # Allow read-only weather queries
+  - name: "allow-weather"
+    description: "Allow all weather API calls"
+    condition:
+      tool_name_pattern: "^(get_weather|weather_.*|forecast)$"
+    action: ALLOW

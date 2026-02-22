@@ -1,0 +1,3 @@
+"""
+MCPCheck test suite.
+"""

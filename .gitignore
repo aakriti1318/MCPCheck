@@ -1,0 +1,78 @@
+# MCPCheck project files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+.codemeter/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Testing
+.coverage
+.pytest_cache/
+htmlcov/
+.tox/
+.nox/
+coverage.xml
+*.cover
+.hypothesis/
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# ruff
+.ruff_cache/
+
+# UV
+.uv/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Secrets - NEVER commit these
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+secrets.yaml
+secrets.json
+
+# MCP configs with potential tokens
+.cursor/mcp.json
+.vscode/mcp.json
+mcp-secrets.json
+
+# Build artifacts
+*.sarif
+bandit-report.json
