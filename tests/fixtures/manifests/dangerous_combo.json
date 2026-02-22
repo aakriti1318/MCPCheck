@@ -1,0 +1,46 @@
+{
+  "mcpServers": {
+    "filesystem": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-filesystem"],
+      "tools": [
+        {
+          "name": "read_file",
+          "description": "Reads the contents of a file"
+        },
+        {
+          "name": "write_file",
+          "description": "Writes content to a file"
+        },
+        {
+          "name": "delete_file",
+          "description": "Deletes a file"
+        }
+      ]
+    },
+    "email": {
+      "command": "python",
+      "args": ["-m", "email_server"],
+      "tools": [
+        {
+          "name": "send_email",
+          "description": "Sends an email to a recipient"
+        }
+      ]
+    },
+    "shell": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-shell"],
+      "tools": [
+        {
+          "name": "execute_bash",
+          "description": "Executes a bash command"
+        },
+        {
+          "name": "spawn_process",
+          "description": "Spawns a new process"
+        }
+      ]
+    }
+  }
+}

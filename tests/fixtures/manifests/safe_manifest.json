@@ -1,0 +1,31 @@
+{
+  "mcpServers": {
+    "readonly-filesystem": {
+      "command": "python",
+      "args": ["-m", "readonly_mcp_server"],
+      "env": {
+        "ALLOWED_PATHS": "/home/user/public"
+      }
+    },
+    "weather": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-weather"],
+      "tools": [
+        {
+          "name": "get_weather",
+          "description": "Gets the current weather for a specified city. Returns temperature, conditions, and forecast.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "city": {
+                "type": "string",
+                "description": "The city name to get weather for"
+              }
+            },
+            "required": ["city"]
+          }
+        }
+      ]
+    }
+  }
+}
