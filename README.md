@@ -1,305 +1,239 @@
-# MCPCheck
+# MCPHook
 
-[![CI](https://github.com/yourusername/mcpcheck/actions/workflows/ci.yml/badge.svg)](https://github.com/yourusername/mcpcheck/actions/workflows/ci.yml)
-[![PyPI version](https://badge.fury.io/py/mcpcheck.svg)](https://badge.fury.io/py/mcpcheck)
-[![Python versions](https://img.shields.io/pypi/pyversions/mcpcheck.svg)](https://pypi.org/project/mcpcheck/)
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![CI](https://github.com/aakriti1318/MCPHook/actions/workflows/ci.yml/badge.svg)](https://github.com/aakriti1318/MCPHook/actions/workflows/ci.yml)
+[![PyPI version](https://badge.fury.io/py/mcphook.svg)](https://badge.fury.io/py/mcphook)
+[![Python versions](https://img.shields.io/pypi/pyversions/mcphook.svg)](https://pypi.org/project/mcphook/)
+[![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
 [![Code style: ruff](https://img.shields.io/badge/code%20style-ruff-000000.svg)](https://github.com/astral-sh/ruff)
 
-**MCPCheck** is a security scanner and runtime policy engine for [Model Context Protocol (MCP)](https://modelcontextprotocol.io/) configurations. It detects vulnerabilities like tool poisoning, credential exposure, and over-permissioned tool combinations in your MCP setup.
+**MCPHook** is a comprehensive security scanning and runtime policy engine for [Model Context Protocol (MCP)](https://modelcontextprotocol.io/) configurations. It detects and prevents critical security vulnerabilities in MCP server deployments, including tool poisoning, credential exposure, and dangerous permission combinations.
 
-## 🔥 Features
+## Key Features
 
-- **Static Analysis** — Scan MCP manifests for security issues before deployment
-- **9+ Detection Rules** — Comprehensive coverage of OWASP LLM Top 10 risks
-- **Tool Poisoning Detection** — Find prompt injections, hidden unicode, and system override attempts
-- **Credential Scanning** — Detect hardcoded tokens (GitHub, OpenAI, AWS, etc.)
-- **Permission Analysis** — Identify dangerous tool combinations (read+write+send)
-- **Multiple Output Formats** — Rich terminal, JSON, and SARIF (GitHub Code Scanning)
-- **LLM-Agnostic Semantic Analysis** — Optional deep analysis using LiteLLM (100+ providers)
-- **Policy Engine** — Runtime enforcement with YAML-based rules
+- **Static Analysis** — Comprehensive scanning of MCP manifests before deployment
+- **9+ Detection Rules** — Coverage for OWASP LLM Top 10 and MCP-specific threats
+- **Tool Poisoning Detection** — Identifies prompt injections, hidden Unicode, and system override attempts
+- **Credential Scanning** — Detects hardcoded tokens (GitHub, OpenAI, AWS, Slack, etc.)
+- **Permission Analysis** — Flags dangerous tool combinations and over-permission scenarios
+- **Multiple Output Formats** — Terminal, JSON, and SARIF (GitHub Code Scanning integration)
+- **LLM-Agnostic Semantic Analysis** — Deep analysis using LiteLLM (100+ LLM providers)
+- **Policy Engine** — YAML-based runtime policy enforcement
+- **Fast & Lightweight** — Minimal dependencies, optimized for CI/CD pipelines
 
-## 📦 Installation
+## Installation
 
 ```bash
 # Using pip
-pip install mcpcheck
+pip install mcphook
 
 # Using uv (recommended)
-uv add mcpcheck
+uv add mcphook
 
-# Using pipx (for CLI)
-pipx install mcpcheck
+# Using pipx (for CLI only)
+pipx install mcphook
 ```
 
-## 🚀 Quick Start
+### Requirements
+- Python 3.12+
+- pip, uv, or pipx
 
-### Scan your MCP configuration
+## Quick Start
+
+### Scan Your MCP Configuration
 
 ```bash
 # Scan Cursor's MCP config
-mcpcheck scan ~/.cursor/mcp.json
+mcphook scan ~/.cursor/mcp.json
 
 # Scan VS Code's MCP config
-mcpcheck scan ~/.vscode/mcp.json
+mcphook scan ~/.vscode/mcp.json
 
-# Scan with JSON output
-mcpcheck scan mcp.json --format json
+# Export as JSON
+mcphook scan mcp.json --format json -o report.json
 
-# Scan with SARIF output (for GitHub Code Scanning)
-mcpcheck scan mcp.json --format sarif -o results.sarif
+# Export as SARIF for GitHub Code Scanning
+mcphook scan mcp.json --format sarif -o results.sarif
 ```
 
 ### Example Output
 
 ```
-╭─────────────────────────────────────────────────────────────────────────────╮
-│                           MCPCheck Security Scan                            │
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                           MCPHook Security Scan                             │
 │                              ~/.cursor/mcp.json                             │
-╰─────────────────────────────────────────────────────────────────────────────╯
+└─────────────────────────────────────────────────────────────────────────────┘
 
- 🔴 CRITICAL │ AUTH-001 │ Hardcoded GitHub Token
+ CRITICAL │ AUTH-001 │ Hardcoded GitHub Token
     Server: github
     Location: mcpServers.github.env.GITHUB_PERSONAL_ACCESS_TOKEN
-    Detail: GitHub Personal Access Token detected in configuration file
-    Remediation: Use environment variable references: ${GITHUB_TOKEN}
+    Detail: GitHub Personal Access Token detected in plain text
+    Remediation: Use environment variables: export GITHUB_TOKEN=***
 
- 🟠 HIGH │ OVERPERM-001 │ Dangerous Tool Combination
+ HIGH │ OVERPERM-001 │ Dangerous Tool Combination
     Server: filesystem + shell
-    Detail: read_file + write_file + execute_bash creates exfiltration risk
+    Detail: read_file + write_file + execute_bash = exfiltration risk
     Remediation: Isolate high-privilege tools into separate servers
 
-╭─────────────────────────────────────────────────────────────────────────────╮
-│  Summary: 2 findings │ 1 Critical │ 1 High │ 0 Medium │ 0 Low │ 0 Info     │
-│  Status: ❌ FAILED                                                          │
-╰─────────────────────────────────────────────────────────────────────────────╯
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  Summary: 2 findings │ 1 Critical │ 1 High │ 0 Medium │ 0 Low             │
+│  Status: FAILED - Fix issues before deployment                             │
+└─────────────────────────────────────────────────────────────────────────────┘
 ```
 
-### Initialize a policy
+### Initialize a Security Policy
 
 ```bash
-# Create a default mcpcheck.yaml policy
-mcpcheck init
+# Create default policy file
+mcphook init
 
-# Initialize with strict mode
-mcpcheck init --strict
+# Create with strict security settings
+mcphook init --strict
+
+# List all available detection rules
+mcphook rules
 ```
 
-### List available rules
+## Detection Rules
+
+| Rule ID | Rule Name | Severity | Description |
+|---------|-----------|----------|-------------|
+| `TOOL-POISON-001` | System Override | Critical | Detects `[SYSTEM:]` prefix and instruction override patterns |
+| `TOOL-POISON-002` | Imperative Injection | Critical | Detects covert actions like "send to URL" or "without user consent" |
+| `TOOL-POISON-003` | Hidden Unicode | High | Detects zero-width characters and lookalike homoglyphs |
+| `AUTH-EXPOSURE-001` | Hardcoded Token | Critical | Detects exposed API tokens (GitHub, OpenAI, AWS, Slack, etc.) |
+| `AUTH-EXPOSURE-002` | Database Credentials | Critical | Detects hardcoded database connection strings and passwords |
+| `OVERPERM-001` | Dangerous Tool Combo | High | Identifies read+write+send combinations creating exfiltration risk |
+| `DYNAMIC-SCHEMA-001` | Unconstrained Parameters | High | Flags tools accepting arbitrary code or command execution |
+
+## Usage Guide
+
+For detailed usage examples, see [USAGE.md](docs/USAGE.md).
+
+### Command-Line Interface
 
 ```bash
-mcpcheck rules
+# Display help
+mcphook --help
+
+# Scan with specific policy
+mcphook scan mcp.json --policy mcphook.yaml
+
+# Fail on severity level
+mcphook scan mcp.json --fail-on high
+
+# Verbose output
+mcphook scan mcp.json -v
+
+# Semantic analysis with LLM
+mcphook scan mcp.json --semantic --llm-provider openai
 ```
 
-## 🛡️ Detection Rules
+### Programmatic API
 
-| Rule ID | Name | Severity | Description |
-|---------|------|----------|-------------|
-| `TOOL-POISON-001` | System Override | Critical | Detects `[SYSTEM:]` or "ignore instructions" patterns |
-| `TOOL-POISON-002` | Imperative Injection | Critical | Detects "send to URL" or "without telling user" |
-| `TOOL-POISON-003` | Hidden Unicode | High | Detects zero-width chars and homoglyphs |
-| `AUTH-001` | Plaintext Token | Critical | Detects hardcoded API keys and tokens |
-| `AUTH-002` | Missing Gitignore | Medium | Flags sensitive files not in .gitignore |
-| `OVERPERM-001` | Dangerous Combo | High | Flags read+write+execute combinations |
-| `OVERPERM-002` | Unrestricted Access | Medium | Flags tools with no path restrictions |
-| `DYNAMIC-001` | Remote Schema | High | Flags tools with dynamic/remote schemas |
-| `DYNAMIC-002` | Mutable Config | Medium | Flags non-deterministic configurations |
+```python
+from mcphook.scanner import MCPScanner
+from mcphook.policy import PolicyEngine
 
-## ⚙️ Configuration
+# Initialize scanner
+scanner = MCPScanner()
 
-Create a `mcpcheck.yaml` in your project root:
+# Load and scan manifest
+manifest = scanner.load_manifest("mcp.json")
+findings = scanner.scan(manifest)
+
+# Apply policy
+engine = PolicyEngine()
+engine.load_policy("mcphook.yaml")
+violations = engine.check(findings)
+
+# Export results
+scanner.export_sarif(findings, "results.sarif")
+```
+
+## Policy Configuration
+
+Create a `mcphook.yaml` file to customize detection rules:
 
 ```yaml
-# MCPCheck Configuration
-version: "1"
-
-# Rules to enable (all by default)
-rules:
-  enabled:
-    - TOOL-POISON-*
-    - AUTH-*
-    - OVERPERM-*
-  disabled:
-    - DYNAMIC-002  # Disable specific rule
-
-# Severity threshold (only report this and above)
-severity_threshold: LOW
-
-# Output configuration
-output:
-  format: terminal  # terminal, json, sarif
-  verbose: true
-
-# Paths to scan
-paths:
-  - ~/.cursor/mcp.json
-  - ~/.vscode/mcp.json
-  - .mcp.json
-
-# Ignore patterns
-ignore:
-  - "**/test/**"
-  - "**/fixtures/**"
-```
-
-## 🔧 Policy Engine
-
-MCPCheck includes a runtime policy engine for enforcing tool usage:
-
-```yaml
-# policy.yaml
-version: "1"
-name: "production-policy"
+version: "1.0"
+name: "Production Security Policy"
 
 rules:
-  - name: "block-shell"
-    condition:
-      tool_name_pattern: "^execute_(bash|shell|cmd)$"
-    action: BLOCK
+  AUTH-EXPOSURE-001:
+    enabled: true
+    severity: critical
+    
+  OVERPERM-001:
+    enabled: true
+    severity: high
+    
+  TOOL-POISON-003:
+    enabled: true
+    severity: high
 
-  - name: "audit-file-writes"
-    condition:
-      tool_name: "write_file"
-      param_matches:
-        path: "^/etc/.*"
-    action: AUDIT
-
-  - name: "allow-safe-reads"
-    condition:
-      tool_name: "read_file"
-      param_matches:
-        path: "^/tmp/.*"
-    action: ALLOW
+enforcement:
+  fail_on_severity: high
+  allow_exceptions:
+    - rule_id: "OVERPERM-001"
+      server: "safe-tools"
+      reason: "Reviewed and approved by security team"
 ```
 
-## 🧪 Semantic Analysis (Optional)
-
-Enable LLM-powered deep analysis for detecting sophisticated prompt injections:
-
-```bash
-# Using Claude
-export ANTHROPIC_API_KEY=sk-ant-...
-mcpcheck scan mcp.json --semantic
-
-# Using OpenAI
-export OPENAI_API_KEY=sk-...
-mcpcheck scan mcp.json --semantic --model openai/gpt-4o
-
-# Using Ollama (local)
-mcpcheck scan mcp.json --semantic --model ollama/llama3.2
-```
-
-## 📊 CI/CD Integration
+## CI/CD Integration
 
 ### GitHub Actions
 
 ```yaml
-- name: MCPCheck Security Scan
-  run: |
-    pip install mcpcheck
-    mcpcheck scan . --format sarif -o mcpcheck.sarif
+name: Security Scan
+on: [push, pull_request]
 
-- name: Upload SARIF
-  uses: github/codeql-action/upload-sarif@v3
-  with:
-    sarif_file: mcpcheck.sarif
+jobs:
+  mcphook:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.12"
+      - run: pip install mcphook
+      - run: mcphook scan .cursor/mcp.json --format sarif -o results.sarif
+      - uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: results.sarif
 ```
 
-### Pre-commit Hook
+## Contributing
 
-```yaml
-# .pre-commit-config.yaml
-repos:
-  - repo: https://github.com/yourusername/mcpcheck
-    rev: v0.1.0
-    hooks:
-      - id: mcpcheck
-```
+We welcome contributions! Please:
 
-## 🐍 Python API
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-rule`)
+3. Add tests for new functionality
+4. Submit a pull request
 
-```python
-from mcpcheck import scan_manifest
-from mcpcheck.domain.models import Severity
+## Documentation
 
-# Scan a manifest file
-report = scan_manifest("~/.cursor/mcp.json")
+- [Usage Guide](docs/USAGE.md) — Comprehensive usage examples
+- [Detection Rules](docs/rules.md) — Detailed rule documentation
+- [API Reference](docs/api.md) — Programmatic usage guide
+- [Policy Format](docs/policy.md) — Policy configuration guide
 
-# Check results
-if not report.passed:
-    for finding in report.findings_by_severity(Severity.CRITICAL):
-        print(f"{finding.rule_id}: {finding.title}")
+## Issues & Support
 
-# Scan with custom options
-from mcpcheck.engine.scanner import RuleEngine, parse_manifest_file
+- **Report bugs**: [GitHub Issues](https://github.com/aakriti1318/MCPHook/issues)
+- **Security concerns**: Email security@example.com (do not open public issues)
+- **Discussions**: [GitHub Discussions](https://github.com/aakriti1318/MCPHook/discussions)
 
-engine = RuleEngine()
-manifest = parse_manifest_file("mcp.json")
-report = engine.scan(manifest, severity_threshold=Severity.HIGH)
+## License
 
-print(report.to_json())
-```
+MCPHook is licensed under the Apache License 2.0. See [LICENSE](LICENSE) for details.
 
-## 🏗️ Architecture
+## Acknowledgments
 
-MCPCheck follows a **hexagonal (ports & adapters)** architecture:
+- Built for the [Model Context Protocol](https://modelcontextprotocol.io/) community
+- Inspired by OWASP LLM Top 10 and MLSecOps best practices
+- Contributors and security researchers worldwide
 
-```
-src/mcpcheck/
-├── domain/         # Core domain models (Pydantic, zero dependencies)
-│   ├── models.py   # Finding, Severity, ToolDefinition, etc.
-│   ├── report.py   # ScanReport, ScanSummary
-│   └── policy.py   # Policy, PolicyRule
-├── rules/          # Detection rules (Protocol-based)
-│   ├── base.py     # Rule protocol & BaseRule
-│   ├── tool_poison.py
-│   ├── auth_exposure.py
-│   └── ...
-├── engine/         # Core logic
-│   ├── scanner.py  # RuleEngine
-│   ├── semantic.py # LLM analysis
-│   └── policy_engine.py
-├── adapters/       # External integrations
-│   ├── fs.py       # File system
-│   ├── http.py     # HTTP client
-│   └── llm.py      # LiteLLM adapter
-├── renderers/      # Output formatters
-│   ├── terminal.py # Rich terminal
-│   ├── json_renderer.py
-│   └── sarif_renderer.py
-└── cli/            # Typer CLI
-    └── main.py
-```
+---
 
-## 🤝 Contributing
-
-Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
-
-```bash
-# Clone the repo
-git clone https://github.com/yourusername/mcpcheck.git
-cd mcpcheck
-
-# Install dev dependencies with uv
-uv sync --dev
-
-# Run tests
-uv run pytest
-
-# Run linting
-uv run ruff check src tests
-uv run mypy src
-
-# Install pre-commit hooks
-uv run pre-commit install
-```
-
-## 📜 License
-
-MIT License — see [LICENSE](LICENSE) for details.
-
-## 🔗 Resources
-
-- [Model Context Protocol](https://modelcontextprotocol.io/)
-- [OWASP LLM Top 10](https://owasp.org/www-project-top-10-for-large-language-model-applications/)
-- [MITRE ATLAS](https://atlas.mitre.org/)
+Made by the MCPHook team
