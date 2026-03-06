@@ -1,4 +1,101 @@
-# MCPCheck
+# MCPHook
+
+MCPHook is a security scanner and runtime policy engine for [Model Context Protocol (MCP)](https://modelcontextprotocol.io/) configurations. It detects vulnerabilities like tool poisoning, credential exposure, and over-permissioned tool combinations in your MCP setup.
+
+## Features
+
+- **Static Analysis** — Scan MCP manifests for security issues before deployment
+- **9+ Detection Rules** — Comprehensive coverage of OWASP LLM Top 10 risks
+- **Tool Poisoning Detection** — Find prompt injections, hidden unicode, and system override attempts
+- **Credential Scanning** — Detect hardcoded tokens (GitHub, OpenAI, AWS, etc.)
+- **Permission Analysis** — Identify dangerous tool combinations (read+write+send)
+- **Multiple Output Formats** — Rich terminal, JSON, and SARIF (GitHub Code Scanning)
+- **LLM-Agnostic Semantic Analysis** — Optional deep analysis using LiteLLM (100+ providers)
+- **Policy Engine** — Runtime enforcement with YAML-based rules
+
+## Installation
+
+```bash
+# Using pip
+pip install mcphook
+
+# Using uv (recommended)
+uv add mcphook
+
+# Using pipx (for CLI)
+pipx install mcphook
+```
+
+## Quick Start
+
+### Scan your MCP configuration
+
+```bash
+# Scan Cursor's MCP config
+mcphook scan ~/.cursor/mcp.json
+
+# Scan VS Code's MCP config
+mcphook scan ~/.vscode/mcp.json
+
+# Scan with JSON output
+mcphook scan mcp.json --format json
+
+# Scan with SARIF output (for GitHub Code Scanning)
+mcphook scan mcp.json --format sarif -o results.sarif
+```
+
+### Example Output
+
+```
+...example output...
+```
+
+### Initialize a policy
+
+```bash
+# Create a default mcphook.yaml policy
+mcphook init
+
+# Initialize with strict mode
+mcphook init --strict
+```
+
+### List available rules
+
+```bash
+mcphook rules
+```
+
+## Detection Rules
+
+| Rule ID | Name | Severity | Description |
+|---------|------|----------|-------------|
+| AUTH-001 | Hardcoded GitHub Token | Critical | Detects hardcoded GitHub tokens in config |
+| OVERPERM-001 | Dangerous Tool Combination | High | Detects risky tool permission combos |
+| ... | ... | ... | ... |
+
+## License
+
+MIT License# MCPHoook
+<p align="center">
+
+```
+███╗   ███╗ ██████╗██████╗
+████╗ ████║██╔════╝██╔══██╗
+██╔████╔██║██║     ██████╔╝
+██║╚██╔╝██║██║     ██╔═══╝
+██║ ╚═╝ ██║╚██████╗██║
+╚═╝     ╚═╝ ╚═════╝╚═╝
+
+██╗  ██╗ ██████╗  ██████╗ ██╗  ██╗
+██║  ██║██╔═══██╗██╔═══██╗██║ ██╔╝
+███████║██║   ██║██║   ██║█████╔╝
+██╔══██║██║   ██║██║   ██║██╔═██╗
+██║  ██║╚██████╔╝╚██████╔╝██║  ██╗
+╚═╝  ╚═╝ ╚═════╝  ╚═════╝ ╚═╝  ╚═╝
+```
+
+</p>
 
 [![PyPI version](https://badge.fury.io/py/mcpcheck.svg)](https://badge.fury.io/py/mcpcheck)
 [![Python versions](https://img.shields.io/pypi/pyversions/mcpcheck.svg)](https://pypi.org/project/mcpcheck/)
